@@ -60,7 +60,7 @@ also searches every .var column for the symbol before giving up.
 
 Read-only w.r.t. the canonical object. Writes NO labels. Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

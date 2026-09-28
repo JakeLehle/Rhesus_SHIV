@@ -39,7 +39,7 @@ goes to new files. Spyder cells (# %%). Headless-safe (sc_pre env).
 
 This is step 3a. Step 3b (cell-level DEG) is written after we review this output.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

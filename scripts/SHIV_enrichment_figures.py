@@ -63,7 +63,7 @@ OUTPUT
 
 All text 28-34pt, saved as both PDF and PNG at 300 DPI.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

@@ -50,7 +50,7 @@ silently lost (NHP samples are irreplaceable; we want that number explicit).
 
 Run WITH python (sc_pre env). Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

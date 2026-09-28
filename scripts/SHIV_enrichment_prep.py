@@ -48,7 +48,7 @@ with no key required.
 
 Read-only w.r.t. the DEG output. Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

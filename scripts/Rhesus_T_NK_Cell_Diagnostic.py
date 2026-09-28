@@ -43,7 +43,7 @@ clean TotalSeq-C and are used here for the protein cross-check.
 
 Input : shiv_host_merged.h5ad  (host object + recovered SHIV in obs; produced
         at the end of the STARsolo viral-read-recovery session)
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date  : July 2026
 """
 

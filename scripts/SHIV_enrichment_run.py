@@ -33,7 +33,7 @@ Macaca mulatta annotations natively.
 
 Read-only w.r.t. everything upstream. Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

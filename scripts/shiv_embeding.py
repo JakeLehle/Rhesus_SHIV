@@ -20,7 +20,7 @@ already log-normalized (it is, from the correction step) or still raw.
 Output: a new embedded object; the plotting script reads it. Labels are NOT
 changed here.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

@@ -34,7 +34,7 @@ What it adds
 Read-only. No BAM, reference, or object is modified.
 Conventions: Spyder cells (# %%), config in Cell 1, warn-and-continue.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

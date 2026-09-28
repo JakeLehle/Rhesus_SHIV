@@ -61,7 +61,7 @@ evidence layer, and the recommendation is read off the pseudobulk layer.
 
 Read-only w.r.t. the input object. Spyder cells (# %%). Headless under SLURM.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

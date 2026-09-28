@@ -18,7 +18,7 @@ This tests it directly: overlap of STARsolo SHIV barcodes with CellRanger cells,
 DIRECT vs REVERSE-COMPLEMENT. Whichever wins names the fix.
 
 Run WITH python (sc_pre). Light.
-Author: Jake Lehle / Kaushal Lab — June 2026
+Author: Jake Lehle — June 2026
 """
 
 # %% Cell 1 — Config + loaders

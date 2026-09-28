@@ -42,7 +42,7 @@ runs the cell-level DEG.
 
 Run WITH python (sc_pre env). Spyder cells (# %%). Headless-safe under SLURM.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

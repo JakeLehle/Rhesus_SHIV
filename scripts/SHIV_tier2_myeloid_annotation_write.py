@@ -103,7 +103,7 @@ resolvable by cluster identity here:
 QC-excluded cells are FLAGGED, never deleted. The DEG script respects qc_exclude.
 Both input objects are left untouched; output goes to new files.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 
