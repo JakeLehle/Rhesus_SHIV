@@ -28,7 +28,7 @@ read is caught unless ALL its seeds are corrupted (negligible and untrustworthy)
 
 Read-only. Dumps every hit's FULL read sequence so hits can be eyeballed/BLASTed.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

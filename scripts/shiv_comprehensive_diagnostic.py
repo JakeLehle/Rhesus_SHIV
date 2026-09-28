@@ -33,7 +33,7 @@ Design
   - All tunable knobs live in Cell 1.
   - Spyder cells (# %%). Runs headless under SLURM (sc_pre env) or interactively.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

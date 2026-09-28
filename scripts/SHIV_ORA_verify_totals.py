@@ -23,7 +23,7 @@ the lists the pipeline would have written, and step 2 should not run.
 
 Reads only. Takes seconds. Run it before shiv_enrichment_run.py.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

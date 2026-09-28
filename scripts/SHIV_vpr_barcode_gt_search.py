@@ -53,7 +53,7 @@ fold them in once resolved.
 
 Read-only. Nothing on disk is modified. Spyder cells (# %%); runs under SLURM.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: September 2026
 """
 

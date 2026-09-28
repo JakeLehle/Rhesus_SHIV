@@ -20,7 +20,7 @@ This resolves the "GEM-X vs v3" ambiguity with data, not product naming.
 Run WITH python (not bash). Spyder cells (# %%). Memory-light: observed barcode
 set is small and whitelist files are STREAMED (safe on the shared titan node).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: June 2026
 """
 

@@ -34,7 +34,7 @@ provisional-NK-with-TCR count before treating labels as final.
 
 Run WITH python (sc_pre env). Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

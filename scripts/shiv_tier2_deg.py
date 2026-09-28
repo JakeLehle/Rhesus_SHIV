@@ -40,7 +40,7 @@ Contrasts (all cell-level, all on qc_exclude == False):
 
 Read-only w.r.t. objects; writes DEG CSVs + figures. Spyder cells (# %%).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

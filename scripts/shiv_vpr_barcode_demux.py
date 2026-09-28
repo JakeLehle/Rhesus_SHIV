@@ -36,7 +36,7 @@ a Binhua coverage stat (of the known barcodes per animal, how many we recovered)
 
 Read-only. Nothing on disk is modified. Spyder cells (# %%); runs under SLURM.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

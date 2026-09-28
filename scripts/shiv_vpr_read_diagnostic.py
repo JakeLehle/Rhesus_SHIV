@@ -29,7 +29,7 @@ Sources pulled per library:
 Conventions: Spyder cells (# %%), config in Cell 1, warn-and-continue, read-only.
 Runs headless under SLURM (HEADLESS=True) or interactively in Spyder (False).
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: July 2026
 """
 

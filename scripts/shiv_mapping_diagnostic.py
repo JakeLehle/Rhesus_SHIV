@@ -31,7 +31,7 @@ are correctly NOT counted.
 
 Run WITH python (not bash). Spyder cells (# %%). Light job.
 
-Author: Jake Lehle / Kaushal Lab
+Author: Jake Lehle
 Date: June 2026
 """
 
