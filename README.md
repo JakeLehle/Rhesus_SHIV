@@ -4,6 +4,10 @@ Single-cell multi-omics analysis of barcoded SHIV-AD8EO infection in rhesus maca
 5' scRNA-seq + CITE-seq + TCR VDJ from Cell Ranger `multi`, analysed in Scanpy on the
 Texas Biomed HPC.
 
+Companion document: **`SESSION_CONTEXT.md`** carries the full script inventory with
+inputs and outputs, every path, and the `obs` column reference needed to subset the
+objects without rederiving it. Read both to pick this project up cold.
+
 Scientific lead and data owner: Zoey Wallis. Analysis: Jake Lehle.
 Virus and barcode ground truth: Brandon Keele's group (barcoded SHIVAD8EOM);
 per-animal plasma barcode catalog from Binhua.
@@ -69,8 +73,11 @@ GTF seqnames before building, and use `--expect-cells` rather than `--force-cell
 `MKREF_Mmul10_SHIVAD8EO.sh` records the decision that the 34 bp barcode does **not**
 need to be in the reference, on the reasoning that Cell Ranger maps to coding regions
 and barcode detection happens post-alignment. That is why the reference in use is the
-unbarcoded parental. The consequence is traced in section 6: reads crossing the
-cassette have nothing to align to there.
+unbarcoded parental. That decision was tested directly in October 2026 and found to cost
+almost nothing: rebuilding the reference with the cassette present changed 2,188
+aligned reads to 2,192, on 99 to 100% the same reads. The cassette is still added in
+the planned rebuild (section 7), because the barcode needs to be a countable feature,
+not because its absence was losing reads.
 
 ### Reference relationship to Keele's SHIVAD8EOM file
 
@@ -116,24 +123,41 @@ When searching the lentivirus databases, grep on `"simian immunodeficiency"` and
 ## 3. Object chain
 
 ```
-Cell Ranger multi per-library outs
+Cell Ranger multi per-library outs           Analysis/<SAMPLE_ID>/outs/
    └─ scanpy_analysis_script.py
          adata_qc.h5ad              animal_id, tissue, timepoint, subspecies, QC, raw ADT
          adata_pp.h5ad              + embedding, clusters, CLR ADT
-         adata_annotated.h5ad       + Tier 1 / Tier 2 labels
-   └─ shiv_scanpy_merge.py          attaches recovered SHIV signal onto an existing object
+         adata_annotated.h5ad       + baseline Tier 1 / Tier 2 scores
+   └─ shiv_scanpy_merge.py          attaches recovered SHIV signal (shiv_umi, shiv_pos)
          shiv_host_merged.h5ad
-   └─ Rhesus_T_NK_Cell_Correction.py
+   └─ Rhesus_T_NK_Cell_Correction.py        NK rescore on exclusive anchors + CD3 gate
          shiv_host_tier1_corrected.h5ad
-   └─ shiv_VDJ_integration.py
-         shiv_host_tier1_tcr.h5ad
-   └─ shiv_embeding.py
-         shiv_host_final_embedded.h5ad      <- canonical object for figures and DEG
-   └─ shiv_tier2_annotation_write.py
-         shiv_host_tier2_annotated.h5ad
-   └─ SHIV_tier2_myeloid_annotation_write.py
-         shiv_host_tier2_myeloid_annotated.h5ad
+   └─ shiv_VDJ_integration.py               receptor_type/subtype, chain_pairing, has_tcr
+         shiv_host_tier1_tcr.h5ad          (+ .h5mu MuData sidecar)
+   └─ shiv_embeding.py                      PCA / BBKNN / UMAP / Leiden + ADT CLR
+         shiv_host_final_embedded.h5ad      <- 89,844 cells; figures, flank scan, bc extract
+   └─ shiv_tier1_tcr_recovery.py            CD3-dropout T recovery, B/myeloid quarantined
+         shiv_host_final_tcrTrecovered.h5ad
+   └─ shiv_tier2_diagnostic_v2.py           per-lineage recluster (run once per lineage)
+         shiv_Tcell_subset_reclustered_v2.h5ad
+         shiv_Myeloid_subset_reclustered_v2.h5ad
+   └─ shiv_tier2_annotation_write.py        T subtypes; reads subset + tcrTrecovered
+         shiv_Tcell_annotated.h5ad          (subset, carries tier2_subtype)
+         shiv_host_tier2_annotated.h5ad     (global, carries tier2_celltype)
+   └─ SHIV_tier2_myeloid_annotation_write.py  reads myeloid subset + tier2_annotated
+         shiv_Myeloid_annotated.h5ad        (subset)
+         shiv_host_tier2_myeloid_annotated.h5ad   <- most-annotated global object
 ```
+
+All `shiv_host_*` and `shiv_*_annotated` objects live in
+`${WORKDIR}/shiv_starsolo/merged/`. The three `adata_*.h5ad` from the main pipeline
+live at `${WORKDIR}/` (the script writes them there, not under `Analysis/`).
+
+**Which object to load.** `shiv_host_final_embedded.h5ad` for anything needing the
+UMAP, SHIV status or Tier 1 labels. `shiv_host_tier2_myeloid_annotated.h5ad` when you
+need both `tier2_celltype` and `tier2_myeloid_subtype`. The subset objects when you
+need subcluster-level resolution. Full per-column reference is in
+`SESSION_CONTEXT.md`.
 
 `adata_annotated.h5ad` carries `shiv_positive` / `total_counts_shiv` from Cell Ranger,
 which are the **undercount**. The recovered `shiv_umi` / `shiv_pos` attached by
@@ -327,38 +351,103 @@ up and down genes are run as separate enrichments to keep direction.
 
 ## 5. Current state
 
-**Done and validated**
+Last updated 2026-10-30.
+
+### Done and validated
 
 - Cell Ranger `multi` complete for all 8 libraries with the corrected mapping
-- 126,252 cells loaded, 89,844 after QC
-- Tier 1 annotation complete including recovery of CD3-dropout T cells
-- Tier 2 T cell annotation complete; Tier 2 myeloid annotation complete, RNA-driven
+- 126,252 cells loaded, **89,844 after QC**
+- Tier 1 annotation complete including the T/NK correction and CD3-dropout T recovery
+- Tier 2 T cell annotation complete; Tier 2 myeloid complete, RNA-driven
 - VDJ integrated, gamma-delta called strictly from paired TRG+TRD
 - DEG comparison suite and KEGG/GO over-representation complete
 - Figures delivered for Zoey's committee meeting
 
-**Closed lines, recorded so they are not relitigated**
+### The viral numbers, as measured
+
+| Quantity | Value |
+|---|---|
+| SHIV-positive cells in the final object | **14** |
+| Total SHIV UMI, whole experiment | **143** |
+| SHIV UMI in Pre and non-infected controls | **0** across 19,720 cells |
+| Distinct cell barcodes with viral molecules (R1 realignment) | 711 |
+| Of those, cells already in the object | 171 |
+| Above the 0.131% control background | ~56 |
+| Reads covering any barcode base | 13 |
+| Molecules after CB+UMI dedup | 9 |
+| Cells carrying a barcode | 2 confirmed, 1 pending |
+
+Eleven of the 14 SHIV-positive cells are at 21 DPI. Necropsy PBMC is zero across
+17,019 cells. Molecules per cell barcode is exactly 1.00 in every control library and
+above 1.35 in every infected library, which separates real infection from ambient
+noise independently of any barcode analysis.
+
+### Closed lines, recorded so they are not relitigated
 
 - *Viral divergence as the cause of low SHIV detection.* Ruled out: 97.4% genome
-  breadth at zero mismatches, and 14 assembled contigs at 95 to 100% identity.
+  breadth at zero mismatches, 14 assembled contigs at 95 to 100% identity.
 - *BD AbSeq CD163/CD169 recovery.* Ruled out as a reagent incompatibility with 10x 5'
-  chemistry. Not recoverable in silico.
-- *Single-cell linkage of the vpr viral barcode.* Closed 2026-09-25 as unsalvageable by
-  in-silico recovery. The honest path is targeted VpxF1 amplicon enrichment, which
-  needs new sequencing.
+  chemistry. The 36-mer needs a 3' poly-A and a BD PCR handle; those molecules are
+  never sequenced into the ADT library. Not recoverable in silico.
+- *The missing cassette as a cause of lost reads.* Ruled out October 2026. Rebuilding
+  the reference with the cassette changed 2,188 aligned reads to 2,192, and a read-pool
+  comparison showed 99 to 100% the same reads.
+- *In-silico rescue of the barcode arm.* The extraction is exhaustive: `samtools depth`
+  over the ten barcode bases returns a count equal to the number of cassette reads the
+  extractor recovered, in all 16 library-by-mate combinations, 13 and 13. The limit is
+  143 captured viral molecules against a 1.9% chance any molecule covers the cassette,
+  so 2.7 were expected and 9 were found. No reference, aligner or chemistry change
+  creates reads at a position the library never sampled.
 
-**Open**
+### Open and planned
 
-- The vpr barcode line is being revisited after advice from Keele to anchor on the
-  virus sequence flanking the cassette rather than on the cassette's own invariant
-  half-sites. The flanks verify exactly against his reference and abut the 34 bp
-  cassette with no off-by-one. Whether this changes the outcome depends on whether any
-  reads reach the vpr window at all, which is the question
-  `shiv_vpr_read_diagnostic.py` was built to answer.
+The project is being rebuilt around two changes, detailed in section 7.
+
+- Which timepoint carries the signal is unresolved: the object says 21 DPI, the R1
+  viral-barcode analysis says Necropsy LN. No timepoint figure until this is settled.
+- Which animals are in library H decides whether the second barcode cell survives.
+- Targeted VpxF1 amplicon enrichment off the retained 10x cDNA is the only route to a
+  powered barcode result, and it is bench work.
 
 ---
 
-## 6. Conventions
+## 7. Planned rebuild (next session)
+
+Two changes, both requiring one Cell Ranger rerun, gated on a single-library test.
+
+**1. SHIV GTF surgery.** The SHIV undercount is an annotation failure, not an
+alignment failure: reads align correctly and then fail to land in a counted feature,
+because of overlapping ORFs and unannotated LTRs. Work needed on
+`MKREF_Mmul10_SHIVAD8EO.sh`: collapse the overlapping ORFs into non-overlapping
+countable features, annotate the LTRs, add the 34 bp cassette as its own feature, and
+insert it into the FASTA at position 5862 as `ACGCGC` + 22 N + `GCGCGT`. Expected
+effect: roughly 4x on SHIV-positive cells.
+
+**2. Chemistry switch to `SC5P-PE-v3`.** The current config carries no `chemistry`
+line, so Cell Ranger 10.0.0 auto-detected `SC5P-R2-v3`, which reads R1 for the cell
+barcode and UMI and discards the remaining 109 bases of cDNA. `SC5P-PE-v3` is present
+in the 10.0.0 install and aligns both mates. Expected effect: 30 to 40% more viral
+molecules. Add to `[gene-expression]`:
+
+```
+chemistry,SC5P-PE-v3
+```
+
+**Validation gate.** `sbatch --array=7 CELLRANGER_MULTI_RH_SHIV.sh` runs library H
+alone. H holds 422 of the 711 viral cell barcodes and currently reports 3
+SHIV-positive cells. If it rises toward 45, run the full array.
+
+**What the rebuild breaks.** `SHIV_tier2_myeloid_annotation_write.py` carries
+`EXPECTED_SIZES` with exact per-cluster counts at `FINGERPRINT_TOLERANCE = 0`. A
+reclustered object will fail that check, correctly, and the myeloid `LABEL_MAP` has to
+be rebuilt from a fresh adjudication. The T-cell `SUBTYPE_MAP` has the same exposure
+with no guard at all and should get one before the rebuild. All six annotation steps
+must rerun in order; running Tier 2 against a Tier 1 object that has not had the T/NK
+correction and TCR recovery applied silently reverts both.
+
+---
+
+## 8. Conventions
 
 - **Diagnostic-first.** Read-only diagnostics before any object modification. Labels
   are only written in dedicated annotation passes after the tables have been reviewed.
@@ -394,4 +483,4 @@ Two standing hazards, both learned the hard way:
 Mitochondrial genes use `KEG06_` locus tags, not `MT-`. MHC genes use `MAMU-`, not
 `HLA-`. SIV/SHIV genes carry a `gene-` prefix on `var_names` with plain symbols
 underneath. Marker panels are from RIRA (Bimber et al. 2025, Cell Genomics), which is
-rhesus-validated.# Rhesus_SHIV
+rhesus-validated.
